@@ -4,10 +4,10 @@ namespace TimeTracker.API.Services
 {
     public interface ITimeEntryService
     {
-        List<TimeEntryResponse> GetAllTimeEntries();
-        TimeEntryResponse? GetTimeEntryById(int id);
-        List<TimeEntryResponse> CreateTimeEntries(TimeEntryCreateRequest request);
-        List<TimeEntryResponse>? UpdateTimeEntry(int id, TimeEntryUpdateRequest request);
-        List<TimeEntryResponse>? DeleteTimeEntry(int id);
+        Task<List<TimeEntryResponse>> GetAllTimeEntries();
+        Task<TimeEntryResponse?> GetTimeEntryById(int id);
+        Task<List<TimeEntryResponse>> CreateTimeEntries(TimeEntryCreateRequest request);
+        Task<List<TimeEntryResponse>?> UpdateTimeEntry(int id, TimeEntryUpdateRequest request);
+        Task<List<TimeEntryResponse>?> DeleteTimeEntry(int id);
     }
 }

@@ -1,4 +1,4 @@
-﻿using Mapster;
+﻿
 
 namespace TimeTracker.API.Services
 {
@@ -12,7 +12,7 @@ namespace TimeTracker.API.Services
             _timeEntryRepository = timeEntryRepository;
         }
 
-        public List<TimeEntryResponse> CreateTimeEntries(TimeEntryCreateRequest request)
+        public async Task<List<TimeEntryResponse>> CreateTimeEntries(TimeEntryCreateRequest request)
         {
             #region Manual Mapping
             //var newEntry = new TimeEntry
@@ -25,7 +25,7 @@ namespace TimeTracker.API.Services
 
             var newEntry = request.Adapt<TimeEntry>();
 
-            var result = _timeEntryRepository.CreateTimeEntries(newEntry);
+            var result = await _timeEntryRepository.CreateTimeEntries(newEntry);
 
             #region Manual Mapping
             //return result.Select(t => new TimeEntryResponse
@@ -41,9 +41,9 @@ namespace TimeTracker.API.Services
 
         }
 
-        public List<TimeEntryResponse>? DeleteTimeEntry(int id)
+        public async Task<List<TimeEntryResponse>?> DeleteTimeEntry(int id)
         {
-            var result = _timeEntryRepository.DeleteTimeEntry(id);
+            var result = await _timeEntryRepository.DeleteTimeEntry(id);
             if (result == null)
             {
                 return null;
@@ -52,15 +52,15 @@ namespace TimeTracker.API.Services
             return result.Adapt<List<TimeEntryResponse>>();
         }
 
-        public List<TimeEntryResponse> GetAllTimeEntries()
+        public async Task<List<TimeEntryResponse>> GetAllTimeEntries()
         {
-            var result = _timeEntryRepository.GetAllTimeEntries();
+            var result = await _timeEntryRepository.GetAllTimeEntries();
             return result.Adapt<List<TimeEntryResponse>>();
         }
 
-        public TimeEntryResponse? GetTimeEntryById(int id)
+        public async Task<TimeEntryResponse?> GetTimeEntryById(int id)
         {
-            var result = _timeEntryRepository.GetTimeEntryById(id);
+            var result = await _timeEntryRepository.GetTimeEntryById(id);
             if (result == null)
             {
                 return null;
@@ -69,16 +69,20 @@ namespace TimeTracker.API.Services
             return result.Adapt<TimeEntryResponse>();
         }
 
-        public List<TimeEntryResponse>? UpdateTimeEntry(int id, TimeEntryUpdateRequest request)
+        public async Task<List<TimeEntryResponse>?> UpdateTimeEntry(int id, TimeEntryUpdateRequest request)
         {
-            var updatedEntry = request.Adapt<TimeEntry>();
-            var result = _timeEntryRepository.UpdateTimeEntry(id, updatedEntry);
-            if(result == null)
+            try
             {
+                var updatedEntry = request.Adapt<TimeEntry>();
+                var result = await _timeEntryRepository.UpdateTimeEntry(id, updatedEntry);
+                return result.Adapt<List<TimeEntryResponse>>();
+            }
+            catch (EntityNotFoundException)
+            {
+
                 return null;
             }
 
-            return result.Adapt<List<TimeEntryResponse>>();
 
         }
     }
