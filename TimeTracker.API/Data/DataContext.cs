@@ -7,5 +7,7 @@ namespace TimeTracker.API.Data
         {
         }
         public DbSet<TimeEntry> TimeEntries { get; set; }
+
+        public DbSet<Project> Projects { get; set; }
     }
 }
