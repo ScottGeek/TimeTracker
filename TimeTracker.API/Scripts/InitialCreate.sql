@@ -29,3 +29,4 @@ GO
 COMMIT;
 GO
 
+-- Path: TimeTracker.API/Scripts/InitialCreate.sql
