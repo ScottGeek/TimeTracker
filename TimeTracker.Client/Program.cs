@@ -1,3 +1,6 @@
+global using TimeTracker.Client.Services;
+global using TimeTracker.Shared.Models.Project;
+global using Mapster;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using TimeTracker.Client;
@@ -7,5 +10,8 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+
+builder.Services.AddScoped<ITimeEntryService, TimeEntryService>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
 
 await builder.Build().RunAsync();

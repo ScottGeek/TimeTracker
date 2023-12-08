@@ -9,6 +9,6 @@ namespace TimeTracker.API.Services
         Task<List<TimeEntryResponse>> CreateTimeEntries(TimeEntryCreateRequest request);
         Task<List<TimeEntryResponse>?> UpdateTimeEntry(int id, TimeEntryUpdateRequest request);
         Task<List<TimeEntryResponse>?> DeleteTimeEntry(int id);
-        Task<List<TimeEntryByProjectResponse>> GetTimeEntryByProjectId(int projectId);
+        Task<List<TimeEntryResponse>> GetTimeEntryByProjectId(int projectId);
     }
 }

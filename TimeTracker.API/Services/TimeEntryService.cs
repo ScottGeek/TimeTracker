@@ -69,10 +69,10 @@ namespace TimeTracker.API.Services
             return result.Adapt<TimeEntryResponse>();
         }
 
-        public async Task<List<TimeEntryByProjectResponse>> GetTimeEntryByProjectId(int projectId)
+        public async Task<List<TimeEntryResponse>> GetTimeEntryByProjectId(int projectId)
         {
             var result = await _timeEntryRepository.GetTimeEntriesByProject(projectId);
-            return result.Adapt<List<TimeEntryByProjectResponse>>();
+            return result.Adapt<List<TimeEntryResponse>>();
 
         }
 
