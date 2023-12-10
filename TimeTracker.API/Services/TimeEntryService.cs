@@ -58,6 +58,18 @@ namespace TimeTracker.API.Services
             return result.Adapt<List<TimeEntryResponse>>();
         }
 
+        public async Task<TimeEntryResponseWrapper> GetTimeEntries(int skip, int limit)
+        {
+            var timeEntries = await _timeEntryRepository.GetTimeEntries(skip, limit);
+            var timeEntriesResponses = timeEntries.Adapt<List<TimeEntryResponse>>();
+            var timeEntriesCount = await _timeEntryRepository.GetTimeEntriesCount();
+            return new TimeEntryResponseWrapper
+            { 
+              TimeEntries = timeEntriesResponses,
+              Count = timeEntriesCount
+            };
+        }
+
         public async Task<TimeEntryResponse?> GetTimeEntryById(int id)
         {
             var result = await _timeEntryRepository.GetTimeEntryById(id);

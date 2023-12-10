@@ -6,6 +6,8 @@ namespace TimeTracker.API.Repositories
 
         Task<List<TimeEntry>> GetAllTimeEntries();
         Task<TimeEntry>? GetTimeEntryById(int id);
+        Task<List<TimeEntry>> GetTimeEntries(int skip, int limit);
+        Task<int> GetTimeEntriesCount();
         Task<List<TimeEntry>> CreateTimeEntries(TimeEntry timeEntry);
         Task<List<TimeEntry>?> UpdateTimeEntry(int id, TimeEntry timeEntry);
         Task<List<TimeEntry>?> DeleteTimeEntry(int id);

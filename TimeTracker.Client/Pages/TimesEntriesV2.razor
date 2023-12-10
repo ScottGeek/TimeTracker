@@ -1,0 +1,117 @@
+﻿@page "/timeentriesV2"
+@inject ITimeEntryService TimeEntryService
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+<PageTitle>Time Entries</PageTitle>
+<h3>Times Entries</h3>
+
+<button class="btn btn-primary mb-2" @onclick="CreateTimeEntry">
+    Create Time Entry
+</button>
+
+<QuickGrid ItemsProvider="timeEntriesProvider" Theme="Default" Pagination="@pagination">
+    <PropertyColumn Property="t => t.Start" />
+    <PropertyColumn Property="t => t.End" />
+    <PropertyColumn Property="t => GetDuration(t.Start, t.End)" Title="Duration" />
+    <PropertyColumn Property="t => t.Project.Name" Title="Project" Align="Align.Center">
+        <ColumnOptions>
+            <div>
+                <input type="search" autofocus @bind="projectFilter" @bind:event="oninput"
+                       placeholder="Project name..." />
+            </div>
+        </ColumnOptions>
+    </PropertyColumn>
+    <TemplateColumn>
+        <button class="btn btn-primary" onclick="@(()=> ShowProject(context.Project.Id))">Show Project</button>
+    </TemplateColumn>
+    <TemplateColumn>
+        <button class="btn btn-primary" onclick="@(()=> EditTimeEntry(context.Id))"><i class="bi bi-pencil-square"></i></button>
+    </TemplateColumn>
+</QuickGrid>
+<Paginator State="@pagination" />
+
+
+@if (projectId > 0)
+{
+    <ProjectDetails ProjectId="projectId" />
+}
+
+@code {
+    PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
+    GridItemsProvider<TimeEntryResponse>? timeEntriesProvider;
+
+    int projectId = 0;
+    private string? projectFilter;
+
+    IQueryable<TimeEntryResponse> FilteredTimeEntries
+    {
+        get
+        {
+            var result = TimeEntryService.TimeEntries.AsQueryable();
+            if (!string.IsNullOrEmpty(projectFilter))
+            {
+                result = result.Where(t => t.Project.Name.Contains(projectFilter, StringComparison.CurrentCultureIgnoreCase));
+            }
+            return result;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        timeEntriesProvider = async req =>
+        {
+            var response = await TimeEntryService.GetTimeEntries(req.StartIndex, (int)req.Count);
+            return GridItemsProviderResult.From(items: response!.TimeEntries, totalItemCount: response.Count);
+        };
+
+        await TimeEntryService.GetTimeEntriesByProject(projectId);
+        TimeEntryService.OnChange += StateHasChanged;
+    }
+
+
+    private string GetDuration(DateTime? startTime, DateTime? endTime)
+    {
+
+        if (startTime != null && endTime != null)
+        {
+            var duration = endTime.Value - startTime.Value;
+            var result = $"{duration.Hours}h {duration.Minutes}m {duration.Seconds}s";
+            return result;
+        }
+        return string.Empty;
+
+    }
+
+    private void ShowProject(int id)
+    {
+        if (projectId == id)
+        {
+            return;
+        }
+        else
+        {
+            projectId = id;
+        }
+
+        StateHasChanged();
+
+    }
+
+    public void Dispose()
+    {
+        projectId = 0;
+        TimeEntryService.OnChange -= StateHasChanged;
+    }
+
+    private void CreateTimeEntry()
+    {
+        NavigationManager.NavigateTo("/timeentry");
+    }
+
+    private void EditTimeEntry(int id)
+    {
+        NavigationManager.NavigateTo($"/timeentry/{id}");
+    }
+}
+

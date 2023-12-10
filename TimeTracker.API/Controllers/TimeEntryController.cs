@@ -24,6 +24,12 @@ namespace TimeTracker.API.Controllers
             return Ok(await _timeEntryService.GetAllTimeEntries());
         }
 
+        [HttpGet("{skip}/{limit}")]
+        public async Task<ActionResult<TimeEntryResponseWrapper>> GetTimeEntries(int skip, int limit)
+        {
+            return Ok(await _timeEntryService.GetTimeEntries(skip,limit));
+        }
+
         [HttpGet("project/{projectId}")]
         public async Task<ActionResult<List<TimeEntryResponse>>> GetTimeEntriesByProject(int projectId)
         {
