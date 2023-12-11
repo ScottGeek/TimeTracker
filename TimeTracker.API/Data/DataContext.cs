@@ -1,9 +1,10 @@
 ﻿
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace TimeTracker.API.Data
 {
-    public class DataContext : DbContext
+    public class DataContext : IdentityDbContext
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -13,6 +14,7 @@ namespace TimeTracker.API.Data
         {
             modelBuilder.Entity<TimeEntry>().Navigation(c => c.Project).AutoInclude();
             modelBuilder.Entity<Project>().Navigation(c => c.ProjectDetails).AutoInclude();
+            base.OnModelCreating(modelBuilder);
         }
 
 
@@ -22,7 +24,6 @@ namespace TimeTracker.API.Data
 
         public DbSet<ProjectDetails> ProjectDetails { get; set; }
 
-        public DbSet<User> Users { get; set; }
 
     }
 }
