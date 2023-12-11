@@ -38,6 +38,12 @@
 }
 
 @code {
+
+    // The Change with this version is that we are using the QuickGrid component
+    //   with paged retrivals of date from the server, as opposed to the
+    //   get all of the records into memory and then paging them on the client.
+    //   This is a much more efficient way to do this.
+
     PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
     GridItemsProvider<TimeEntryResponse>? timeEntriesProvider;
 
