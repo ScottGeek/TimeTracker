@@ -6,4 +6,6 @@ global using TimeTracker.API.Data;
 global using TimeTracker.Shared.Exceptions;
 global using Microsoft.EntityFrameworkCore;
 global using TimeTracker.Shared.Models.Project;
+global using TimeTracker.Shared.Models.Account;
+global using TimeTracker.Shared.Models.Login;
 global using Mapster;

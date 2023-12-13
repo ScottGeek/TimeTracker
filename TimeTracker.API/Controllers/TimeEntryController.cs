@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -6,6 +7,7 @@ namespace TimeTracker.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TimeEntryController : ControllerBase
     {
         private readonly ITimeEntryService _timeEntryService;
@@ -21,6 +23,8 @@ namespace TimeTracker.API.Controllers
         [HttpGet]
         public async Task<ActionResult<List<TimeEntryResponse>>> GetAllTimeEntries()
         {
+
+            
             return Ok(await _timeEntryService.GetAllTimeEntries());
         }
 
