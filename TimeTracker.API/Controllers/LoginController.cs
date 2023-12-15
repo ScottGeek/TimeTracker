@@ -8,6 +8,7 @@ namespace TimeTracker.API.Controllers
     public class LoginController : ControllerBase
     {
         private readonly ILoginService _loginService;
+
         public LoginController(ILoginService loginService)
         {
             _loginService = loginService;
@@ -24,5 +25,7 @@ namespace TimeTracker.API.Controllers
             }
             return Ok(result);
         }
+
+
     }
 }

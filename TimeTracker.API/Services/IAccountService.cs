@@ -4,6 +4,6 @@
     {
 
         Task<AccountRegistrationResponse> RegisterAsync(AccountRegistrationRequest request);
-
+        Task AssignRole(string userName, string roleName);
     }
 }

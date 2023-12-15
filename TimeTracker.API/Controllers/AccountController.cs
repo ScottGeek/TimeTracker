@@ -25,5 +25,12 @@ namespace TimeTracker.API.Controllers
             return Ok(result);
         }
 
+        [HttpPost("role")]
+        public async Task<IActionResult> AssignRole(string userName, string roleName)
+        {
+            await _accountService.AssignRole(userName, roleName);
+            return Ok();
+        }
+
     }
 }

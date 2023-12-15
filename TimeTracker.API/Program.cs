@@ -38,41 +38,54 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-builder.Services.AddIdentityCore<User>(options =>
+builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.Password.RequireDigit = false;
     options.Password.RequiredLength = 4;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase = false;
     options.User.RequireUniqueEmail = true;
-
-
 })
     .AddEntityFrameworkStores<DataContext>()
-    .AddSignInManager<SignInManager<User>>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddAuthentication(
-     a =>
-     {
-        a.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        a.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        a.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+//.AddSignInManager<SignInManager<User>>()
+
+//builder.Services.AddIdentityCore<User>(options =>
+//{
+//    options.Password.RequireDigit = false;
+//    options.Password.RequiredLength = 4;
+//    options.Password.RequireNonAlphanumeric = false;
+//    options.Password.RequireUppercase = false;
+//    options.User.RequireUniqueEmail = true;
+
+
+//})
+//    .AddEntityFrameworkStores<DataContext>()
+//    .AddSignInManager<SignInManager<User>>()
+//    .AddDefaultTokenProviders();
+
+builder.Services.AddAuthentication(options => 
+      { 
+          options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+          options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
       })
-     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+
+     .AddJwtBearer(options =>
      {
-     options.TokenValidationParameters = new TokenValidationParameters
-     {
-         ValidateIssuer = true,
-         ValidateAudience = true,
-         ValidateLifetime = true,
-         ValidateIssuerSigningKey = true,
-         ValidIssuer = builder.Configuration["JwtIssuer"],
-         ValidAudience = builder.Configuration["JwtAudience"],
-         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSecurityKey"]!)),
-     };
- })
- .AddIdentityCookies();
+         options.TokenValidationParameters = new TokenValidationParameters
+         {
+             ValidateIssuer = true,
+             ValidateAudience = true,
+             ValidateLifetime = true,
+             ValidateIssuerSigningKey = true,
+             ValidIssuer = builder.Configuration["JwtIssuer"],
+             ValidAudience = builder.Configuration["JwtAudience"],
+             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSecurityKey"]!)),
+         };
+     });
+
+ //.AddIdentityCookies();
 
 builder.Services.AddHttpContextAccessor();
 
