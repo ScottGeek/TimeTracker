@@ -1,8 +1,17 @@
 ﻿@inject IProjectService ProjectService
+@inject AuthenticationStateProvider AuthStateProvider
+@implements IDisposable
 
-<Router AppAssembly="@typeof(App).Assembly">
+<CascadingAuthenticationState>
+  <Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+            <NotAuthorized>
+                    <h3>Whoops!</h3>
+                    Looks like you are not Logged in, so you are not authorized to this area.<br />
+                    Please <a href="login">Login</a> or <a href="register">Register</a> first.
+            </NotAuthorized>
+        </AuthorizeRouteView>
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
     <NotFound>
@@ -11,11 +20,26 @@
             <p role="alert">Sorry, there's nothing at this address.</p>
         </LayoutView>
     </NotFound>
-</Router>
-
+  </Router>
+</CascadingAuthenticationState>
 @code {
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        await ProjectService.LoadAllProjects();
+        AuthStateProvider.AuthenticationStateChanged += OnAuthStateChanged;
+    }
+
+    public async void OnAuthStateChanged(Task<AuthenticationState> task)
+    {
+        var authState = await task;
+        if (authState != null && authState.User.Identity!.IsAuthenticated)
+        {
+            await ProjectService.LoadAllProjects();
+        }
+        
+    }
+
+    public void Dispose()
+    {
+        AuthStateProvider.AuthenticationStateChanged -= OnAuthStateChanged;
     }
 }

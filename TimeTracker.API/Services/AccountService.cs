@@ -12,7 +12,7 @@ namespace TimeTracker.API.Services
             _userManager = userManager;
         }
 
-        public async Task<AccountRegistrationReponse> RegisterAsync(AccountRegistrationRequest request)
+        public async Task<AccountRegistrationResponse> RegisterAsync(AccountRegistrationRequest request)
         {
             var newUser = new User
             {
@@ -25,14 +25,14 @@ namespace TimeTracker.API.Services
             if(!result.Succeeded)
             {
                 var errors = result.Errors.Select(x => x.Description);
-                return new AccountRegistrationReponse
+                return new AccountRegistrationResponse
                 {
                     IsSuccessful = false,
                     Errors = errors
                 };
             }
 
-            return new AccountRegistrationReponse
+            return new AccountRegistrationResponse
             {
                 IsSuccessful = true
             };

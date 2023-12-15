@@ -3,7 +3,7 @@
     public interface IAccountService
     {
 
-        Task<AccountRegistrationReponse> RegisterAsync(AccountRegistrationRequest request);
+        Task<AccountRegistrationResponse> RegisterAsync(AccountRegistrationRequest request);
 
     }
 }

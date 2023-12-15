@@ -15,7 +15,7 @@ namespace TimeTracker.API.Controllers
 
 
         [HttpPost("register")]
-        public async Task<ActionResult<AccountRegistrationReponse>> Register(AccountRegistrationRequest request)
+        public async Task<ActionResult<AccountRegistrationResponse>> Register(AccountRegistrationRequest request)
         {
             var result = await _accountService.RegisterAsync(request);
             if (!result.IsSuccessful)

@@ -14,7 +14,7 @@ namespace TimeTracker.API.Controllers
         }
 
 
-        [HttpPost("login")]
+        [HttpPost]
         public async Task<ActionResult<LoginResponse>> Login(LoginRequest request)
         {
             var result = await _loginService.Login(request);
