@@ -3,8 +3,8 @@
     public interface IAuthService
     {
 
-        public Task Register(AccountRegistrationRequest request);
-        public Task Login(LoginRequest request);
+        public Task<AccountRegistrationResponse> Register(AccountRegistrationRequest request);
+        public Task<LoginResponse> Login(LoginRequest request);
         public Task Logout();
     }
 }

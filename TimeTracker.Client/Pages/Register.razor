@@ -6,37 +6,71 @@
 
 <EditForm Model="newUser" OnValidSubmit="HandleSubmit" >
     <DataAnnotationsValidator />
-    <div>
-        <label for="name">Name</label>
-        <InputText id="name" @bind-Value="newUser.UserName" class="form-control"/>
-        <ValidationMessage For="@(() => newUser.UserName)" />
-    </div>
-    <div>
-        <label for="email" class="mt-2">E-Mail</label>
-        <InputText id="email" @bind-Value="newUser.Email" class="form-control" />
-        <ValidationMessage For="@(() => newUser.Email)" />
-    </div>
-    <div>
-        <label for="password" class="mt-2">Password</label>
-        <InputText id="password" type="password" @bind-Value="newUser.Password" class="form-control" />
-        <ValidationMessage For="@(() => newUser.Password)" />
-    </div>
-    <div>
-        <label for="ConfirmPassword" class="mt-2">Confirm Password</label>
-        <InputText id="ConfirmPassword" type="password" @bind-Value="newUser.ConfirmPassword" class="form-control" />
-        <ValidationMessage For="@(() => newUser.ConfirmPassword)" />
-    </div>
-    <button type="submit" class="btn btn-primary mt-2">Register</button>
+    <MyInputText Label="Name" Id="name" @bind-Value="newUser.UserName" ValFor="() => newUser.UserName" />
+    <MyInputText Label="E-Mail" Id="email" @bind-Value="newUser.Email" ValFor="() => newUser.Email" />
+    <MyInputText Label="Password" Id="password" @bind-Value="newUser.Password" ValFor="() => newUser.Password" Type="password"/>
+    <MyInputText Label="Confirm Password" Id="ConfirmPassword" @bind-Value="newUser.ConfirmPassword" ValFor="() => newUser.ConfirmPassword" Type="password" />
+    <MyButton Text="Register" Type="submit" AddMarginTop="true" Level="MyButton.ButtonLevel.Primary" />
 </EditForm>
+
+@if (registrationFailed)
+{
+  
+        @foreach (var error in errors)
+        {  
+            <div>
+             <span class="text-xs text-red-600 font-bold my-1">@error</span>
+            </div>
+        }
+    
+}
+
+@if (registrationSuccessful)
+{
+    <div>
+          <span class="text-xs text-green-600 font-bold my-1">
+              Registration Successful. You may <a href="login" class="underline">Login</a> now.
+          </span>
+    </div>
+}
 
 @code {
 
-    AccountRegistrationRequest newUser = new AccountRegistrationRequest();
+        AccountRegistrationRequest newUser = new AccountRegistrationRequest();
+        bool registrationFailed = false;
+        bool registrationSuccessful = false;
+
+        List<string> errors = new List<string>();
+
+       
+        protected override void OnInitialized()
+        {
+            newUser = new AccountRegistrationRequest();
+         }
 
 
-    async Task HandleSubmit()
-    {
-        await AuthService.Register(newUser);
-    }
+        async Task HandleSubmit()
+        {
+            registrationFailed = registrationSuccessful = false;
+            errors = new List<string>();
+            var response =  await AuthService.Register(newUser);
 
+            registrationSuccessful = response.IsSuccessful;
+
+            if(!response.IsSuccessful && response.Errors != null)
+            {
+                errors = response.Errors.ToList();
+                registrationFailed = true;
+
+            }
+            else
+            {
+                if (!response.IsSuccessful)
+                {
+                    errors.Add("An unexpected error occurred");
+                    registrationFailed = true;
+                }
+            }
+
+        }
 }

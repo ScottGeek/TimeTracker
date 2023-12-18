@@ -1,0 +1,58 @@
+﻿
+@inherits InputBase<int>
+
+<div>
+    @if(!string.IsNullOrWhiteSpace(Label))
+    {
+      <label for="@Id" class="block text-xs font-medium text-gray-700 mt-2 font-bold">@Label</label>
+    }
+   <select id="@Id" class="@css" @bind="@CurrentValue">
+       @foreach(var item in Items)
+        {
+            <option value="@item.Value">@item.DisplayName</option>
+        }
+    </select>
+    <ValidationMessage For="@ValFor" class="text-xs text-red-600 font-bold my-1" />
+</div>
+
+@code {
+    private string css = "mt-1 p-2 w-full rounded-md border-gray-200 shadow-sm sm:text-sm";
+
+    [Parameter]
+    public string? Id { get; set; }
+    [Parameter]
+    public string? Label { get; set; }
+    [Parameter]
+    public bool AddMarginTop { get; set; } = false;
+    [Parameter]
+    public Expression<Func<int>> ValFor { get; set; } = default!;
+    [Parameter]
+    public IEnumerable<SelectListItem> Items { get; set; } = Enumerable.Empty<SelectListItem>();
+
+    protected override bool TryParseValueFromString(string? value, [MaybeNullWhen(false)] out int result, [NotNullWhen(false)] out string validationErrorMessage)
+    {
+
+        if (int.TryParse(value, out result))
+        {
+            validationErrorMessage = string.Empty;
+            return true;
+        }
+
+        validationErrorMessage = "Inlvaid Selection";
+        return false;
+    }
+
+    protected override void OnParametersSet()
+    {
+        if(AddMarginTop)
+        {
+            css += " mt-2";
+        }
+    }
+
+    public class SelectListItem
+    {
+          public required string Value {get; set; }
+          public required string DisplayName {get; set; }
+    }
+}

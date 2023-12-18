@@ -29,72 +29,47 @@ namespace TimeTracker.Client.Services
             _authStateProvider = authStateProvider;
         }
 
-        public async Task Login(LoginRequest request)
+        public async Task<LoginResponse> Login(LoginRequest request)
         {
             var result = await _httpClient.PostAsJsonAsync("api/login", request);
 
             if (result != null)
             {
                 var response = await result.Content.ReadFromJsonAsync<LoginResponse>();
-                if (!response.IsSuccessful && response.Error != null)
+                if (response.IsSuccessful)
                 {
-                    _toastService.ShowError(response.Error);
-                }
-                else
-                  if (!response.IsSuccessful)
-                  {
-                    _toastService.ShowError("An unexpected error occuried with registraion!");
-                  }
-                  else
-                  {
-
                     if(response.Token != null)
                     {
                         await _localStorage.SetItemAsStringAsync("authToken", response.Token);
                         await _authStateProvider.GetAuthenticationStateAsync();
                     }
 
-                    _toastService.ShowSuccess("You are now logged in!");
                     _navigationManager.NavigateTo("timeentries");
-                  }
+                }
+                return response;
             }
+
+            return new LoginResponse(false, "An unexpected error occuried!");
         }
 
         public async Task Logout()
         {
             await _localStorage.RemoveItemAsync("authToken");
             await _authStateProvider.GetAuthenticationStateAsync();
-            _toastService.ShowSuccess("You are now logged out!");
+            //_toastService.ShowSuccess("You are now logged out!");
             _navigationManager.NavigateTo("/login");
         }
 
-        public async Task Register(AccountRegistrationRequest request)
+        public async Task<AccountRegistrationResponse> Register(AccountRegistrationRequest request)
         {
             var result = await _httpClient.PostAsJsonAsync("api/account/register", request);
 
             if (result != null)
             {
                 var response = await result.Content.ReadFromJsonAsync<AccountRegistrationResponse>();
-                if (!response.IsSuccessful && response.Errors != null)
-                {
-                    foreach (var error in response.Errors)
-                    {
-                        _toastService.ShowError(error);
-                    }
-                }
-                else
-                {
-                    if (!response.IsSuccessful)
-                    {
-                        _toastService.ShowError("An unexpected error occuried with registraion!");
-                    }
-                    else
-                    {
-                        _toastService.ShowSuccess("Registration successful! You may login now.");
-                    }
-                }
+                return response;
             }
-
+            return new AccountRegistrationResponse(false);
         }
     }
 }

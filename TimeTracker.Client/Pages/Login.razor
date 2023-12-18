@@ -5,27 +5,44 @@
 
 <EditForm Model="loginRequest" OnValidSubmit="HandleSubmit">
     <DataAnnotationsValidator />
+    <MyInputText Label="Name" Id="name" @bind-Value="loginRequest.UserName" ValFor="() => loginRequest.UserName"/>
+    <MyInputText Label="Password" Id="password" Type="password" @bind-Value="loginRequest.Password" ValFor="() => loginRequest.Password"/>
+    <MyButton Text="Login" Type="submit" AddMarginTop="true" Level="MyButton.ButtonLevel.Secondary" />
+ </EditForm>
+
+@if (loginFailed)
+{
     <div>
-        <label for="name">Name</label>
-        <InputText id="name" @bind-Value="loginRequest.UserName" class="form-control" />
-        <ValidationMessage For="@(() => loginRequest.UserName)" />
+        <span class="text-xs text-red-600 font-bold my-1">@errorMessage</span>
     </div>
-    <div>
-        <label for="password" class="mt-2">Password</label>
-        <InputText id="password" type="password" @bind-Value="loginRequest.Password" class="form-control" />
-        <ValidationMessage For="@(() => loginRequest.Password)" />
-    </div>
-    <button type="submit" class="btn btn-primary mt-2">Log In</button>
-</EditForm>
+}
 
 @code {
 
     LoginRequest loginRequest = new LoginRequest();
+    bool loginFailed = false;
+    string errorMessage = string.Empty;
 
     public async Task HandleSubmit()
     {
-      
-        await AuthService.Login(loginRequest);
-      
+
+        loginFailed = false;
+        var response = await AuthService.Login(loginRequest);
+
+        if (!response.IsSuccessful && response.Error != null)
+        {
+            errorMessage = response.Error;
+            loginFailed = true;
+        }
+        else
+        {
+            if (!response.IsSuccessful)
+            {
+                errorMessage = "An Unexpected error occurred";
+                loginFailed = true;
+            }
+        }
+
+
     }
 }

@@ -18,28 +18,19 @@ else
 
 <EditForm Model="project" OnValidSubmit="HandleSubmit">
     <DataAnnotationsValidator />
-    <div>
-        <label for="name">Name</label>
-        <InputText id="name" @bind-Value="project.Name" class="form-control" />
-        <ValidationMessage For="@(() => project.Name)" />
+
+    <MyInputText Id="name" Label="Name" @bind-Value="project.Name" ValFor="() => project.Name" />
+    <MyInputTextArea Id="description" Label="Description" @bind-Value="project.Description" ValFor="() => project.Description" />
+    <MyInputDateNullable Id="startDate" Label="Start" @bind-Value="project.StartDate" ValFor="() => project.StartDate" />
+    <MyInputDateNullable Id="endDate" Label="End" @bind-Value="project.EndDate" ValFor="() => project.EndDate" />
+
+    <div class="flex gap-4">
+        @if (Id is not null)
+        {
+            <MyButton Text="Delete" Level="MyButton.ButtonLevel.Danger" AddMarginTop="true" OnClick="DeleteProject" />
+        }
+        <MyButton Text="Save" Type="submit" Level="MyButton.ButtonLevel.Primary" AddMarginTop="true" />
     </div>
-    <div>
-        <label for="description">Description</label>
-        <InputTextArea id="description" @bind-Value="project.Description" class="form-control" />
-    </div>
-    <div>
-        <label for="startDate">Start</label>
-        <InputDate id="startDate" @bind-Value="project.StartDate" class="form-control" />
-    </div>
-    <div>
-        <label for="endDate">End</label>
-        <InputDate id="endDate" @bind-Value="project.EndDate" class="form-control" />
-    </div>
-    @if (Id is not null)
-    {
-        <button type="button" class="btn btn-danger mt-2 mx-1" @onclick="DeleteProject">Delete</button>
-    }
-    <button type="submit" class="btn btn-primary mt-2">Save</button>
 </EditForm>
 
 @code {
