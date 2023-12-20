@@ -8,14 +8,13 @@
 <PageTitle>Time Entries</PageTitle>
 <h3>Times Entries</h3>
 
-<ProjectSelector />
+<TimeEntriesTab TabChanged="TabChanged"/>
+<TimeEntryFilter Type="CurrentFilterType" />
 
-<MyButton Text="Create Time Entry" Level="MyButton.ButtonLevel.Primary" OnClick="CreateTimeEntry"  AddMarginBottom/>
-
-<QuickGrid Items="FilteredTimeEntries" Theme="Default" Pagination="@pagination">
+<QuickGrid Items="FilteredTimeEntries" Pagination="@pagination">
     <PropertyColumn Property="t => t.Start" />
     <PropertyColumn Property="t => t.End" />
-    <PropertyColumn Property="t => GetDuration(t.Start, t.End)" Title="Duration"/>
+    <PropertyColumn Property="t => GetDuration(t)" Title="Duration" />
     <PropertyColumn Property="t => t.Project.Name" Title= "Project" Align="Align.Center">
         <ColumnOptions>
             <div>
@@ -39,6 +38,15 @@
 </QuickGrid>
 <Paginator State="@pagination" />
 
+<div class="flex justify-content-between items-end">
+   <MyButton Text="Create Time Entry" Level="MyButton.ButtonLevel.Primary" OnClick="CreateTimeEntry"  AddMarginBottom/>
+   <span class="font-bold text-lg">Total Duration: @GetTotalDuration()</span>
+</div>
+
+@if(CurrentFilterType == TimeEntriesTab.TimeEntryFilterType.Year)
+{
+    <TimeEntryYearChart />
+}
 
 @if (projectId > 0)
 {
@@ -51,6 +59,8 @@
     int projectId = 0;
     private string? projectFilter;
 
+    TimeEntriesTab.TimeEntryFilterType CurrentFilterType = TimeEntriesTab.TimeEntryFilterType.Day;
+
     IQueryable<TimeEntryResponse> FilteredTimeEntries
     { 
         get
@@ -62,26 +72,62 @@
             }
             return result;
         }
-     }
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        await TimeEntryService.GetTimeEntriesByProject(projectId);
+        //await TimeEntryService.GetTimeEntriesByProject(projectId);
         TimeEntryService.OnChange += StateHasChanged;
+        await LoadIntialTimeEntries(CurrentFilterType);
     }
 
+    private async Task LoadIntialTimeEntries(TimeEntriesTab.TimeEntryFilterType type)
+    {
+        var now = DateTime.Now;
+        switch(type)
+        {
+            case TimeEntriesTab.TimeEntryFilterType.Day:
+                await TimeEntryService.GetTimeEntriesByDay(now.Day, now.Month, now.Year);
+                break;
+            case TimeEntriesTab.TimeEntryFilterType.Month:
+                await TimeEntryService.GetTimeEntriesByMonth(now.Month,now.Year);
+                break;
+            case TimeEntriesTab.TimeEntryFilterType.Year:
+                await TimeEntryService.GetTimeEntriesByYear(now.Year);
+                break;
+            case TimeEntriesTab.TimeEntryFilterType.Project:
+                await TimeEntryService.GetTimeEntriesByProject(0);
+                break;
+        }
+    }
 
-    private string GetDuration(DateTime? startTime, DateTime? endTime)
+    private async Task TabChanged(TimeEntriesTab.TimeEntryFilterType type)
+    {
+        CurrentFilterType = type;
+        await LoadIntialTimeEntries(type);
+    }
+
+    private string GetDuration(TimeEntryResponse entry)
     {
 
-        if (startTime != null && endTime != null)
+        if (!String.IsNullOrEmpty(entry.Start.ToString()) && !String.IsNullOrEmpty(entry.End.ToString()))
         {
-            var duration = endTime.Value - startTime.Value;
-            var result = $"{duration.Hours}h {duration.Minutes}m {duration.Seconds}s";
+            var duration = TimeEntryService.CalculateDuration(entry);
+            var result = $"{(Math.Round(duration.TotalDays,0))}d {duration.Hours}h {duration.Minutes}m {duration.Seconds}s";
             return result;
         }
         return string.Empty;
 
+    }
+
+    private string GetTotalDuration()
+    {
+        int totalMinutes = (int)TimeEntryService.TotalDuration.TotalMinutes;
+        int hours = totalMinutes / 60;
+        int minutes = totalMinutes % 60;
+        var days = Math.Floor((decimal)hours / 24);
+
+        return $"{days}d {hours}h {minutes}m";
     }
 
     private void ShowProject(int id)

@@ -97,20 +97,39 @@ namespace TimeTracker.API.Repositories
                 .ToListAsync();
         }
 
+        public Task<List<TimeEntry>> GetTimeEntriesByDay(int day, int month, int year)
+        {
+            var userId = CheckUserId();
+            return _context.TimeEntries
+                .Where(t => t.User.Id == userId && t.Start.Day == day && t.Start.Month == month && t.Start.Year == year)
+                .ToListAsync();
+        }
+
+        public Task<List<TimeEntry>> GetTimeEntriesByMonth(int month, int year)
+        {
+            var userId = CheckUserId();
+            return _context.TimeEntries
+                .Where(t => t.User.Id == userId && t.Start.Month == month && t.Start.Year == year)
+                .ToListAsync();
+        }
+        public async Task<List<TimeEntry>> GetTimeEntriesByYear(int year)
+        {
+            var userId = CheckUserId();
+            return await _context.TimeEntries
+                .Where(t => t.User.Id == userId && t.Start.Year == year)
+                .ToListAsync();
+        }
+
         public async Task<List<TimeEntry>> GetTimeEntriesByProject(int projectId)
         {
-
-            var userId = _userContextService.GetUserId();
-            if (userId == null)
-            {
-                return new List<TimeEntry>();
-            }
+            var userId = CheckUserId();
 
             var result = await _context.TimeEntries
                 .Where(t => t.ProjectId == projectId && t.User.Id == userId)
                 .ToListAsync();
             return result;
         }
+
 
         public async Task<int> GetTimeEntriesCount()
         {
@@ -132,7 +151,7 @@ namespace TimeTracker.API.Repositories
             var userId = _userContextService.GetUserId();
             if (userId == null)
             {
-                return null;
+                throw new EntityNotFoundException("User was not found!");
             }
 
             var timeEntry = await _context.TimeEntries
@@ -172,6 +191,18 @@ namespace TimeTracker.API.Repositories
             await _context.SaveChangesAsync();
 
             return await GetAllTimeEntries();
+
+        }
+
+        private string CheckUserId()
+        {
+            var userId = _userContextService.GetUserId();
+            if (userId == null)
+            {
+                throw new EntityNotFoundException("User was not found!");
+            }
+
+            return userId;
 
         }
     }

@@ -80,5 +80,26 @@ namespace TimeTracker.API.Controllers
             }
             return Ok(result);
         }
+
+        [HttpGet("year/{year}")]
+        public async Task<ActionResult<List<TimeEntryResponse>>>GetTimeEntriesByYear(int year)
+        {
+            var result = await _timeEntryService.GetTimeEntriesByYear(year);
+            return Ok(result);
+        }
+
+        [HttpGet("month/{month}/{year}")]
+        public async Task<ActionResult<List<TimeEntryResponse>>> GetTimeEntriesByMonth(int month, int year)
+        {
+            var result = await _timeEntryService.GetTimeEntriesByMonth(month, year);
+            return Ok(result);
+        }
+
+        [HttpGet("day/{day}/{month}/{year}")]
+        public async Task<ActionResult<List<TimeEntryResponse>>> GetTimeEntriesByDay(int day, int month, int year)
+        {
+            var result = await _timeEntryService.GetTimeEntriesByDay(day, month, year);
+            return Ok(result);
+        }
     }
 }

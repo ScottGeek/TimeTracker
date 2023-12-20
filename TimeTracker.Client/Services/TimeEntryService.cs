@@ -7,6 +7,8 @@ namespace TimeTracker.Client.Services
     {
         private readonly HttpClient _http;
         public List<TimeEntryResponse> TimeEntries { get; set; } = new List<TimeEntryResponse>();
+        public TimeSpan TotalDuration { get; set; }
+
         public event Action? OnChange;
 
         public TimeEntryService(HttpClient http)
@@ -28,13 +30,10 @@ namespace TimeTracker.Client.Services
                 results = await _http.GetFromJsonAsync<List<TimeEntryResponse>>($"api/timeentry/project/{projectId}");
             }
 
-            if (results != null)
-            { 
-               TimeEntries = results;
-               OnChange?.Invoke();
-            }
+            SetTimeEntries(results);
 
         }
+
 
         public async Task<TimeEntryResponse> GetTimeEntryById(int id)
         {
@@ -59,6 +58,55 @@ namespace TimeTracker.Client.Services
         public async Task<TimeEntryResponseWrapper> GetTimeEntries(int skip, int limit)
         {
             return await _http.GetFromJsonAsync<TimeEntryResponseWrapper>($"api/timeentry/{skip}/{limit}");
+        }
+
+        public async Task GetTimeEntriesByYear(int year)
+        {
+            var results = await _http.GetFromJsonAsync<List<TimeEntryResponse>>($"api/timeentry/year/{year}");
+            SetTimeEntries(results);
+        }
+
+        public async Task GetTimeEntriesByMonth(int month, int year)
+        {
+            var results = await _http.GetFromJsonAsync<List<TimeEntryResponse>>($"api/timeentry/month/{month}/{year}");
+            SetTimeEntries(results);
+        }
+
+        public async Task GetTimeEntriesByDay(int day, int month, int year)
+        {
+            var results = await _http.GetFromJsonAsync<List<TimeEntryResponse>>($"api/timeentry/day/{day}/{month}/{year}");
+            SetTimeEntries(results);
+        }
+        private void SetTimeEntries(List<TimeEntryResponse>? results)
+        {
+            if (results != null)
+            {
+                TimeEntries = results;
+                CalculateTotalDuration();
+                OnChange?.Invoke();
+            }
+        }
+
+        public TimeSpan CalculateDuration(TimeEntryResponse timeEntry)
+        {
+
+            if (timeEntry.End == null || timeEntry.End.Value < timeEntry.Start)
+            {
+                return new TimeSpan();
+            }
+
+            TimeSpan duration = timeEntry.End.Value - timeEntry.Start;
+            return duration;
+
+        }
+
+        private void CalculateTotalDuration()
+        {
+            TotalDuration = new TimeSpan();
+            foreach (var timeEntry in TimeEntries)
+            {
+                TotalDuration += CalculateDuration(timeEntry);
+            }
         }
     }
 }

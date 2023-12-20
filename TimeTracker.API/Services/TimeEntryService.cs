@@ -70,6 +70,24 @@ namespace TimeTracker.API.Services
             };
         }
 
+        public async Task<List<TimeEntryResponse>> GetTimeEntriesByDay(int day, int month, int year)
+        {
+            var result = await _timeEntryRepository.GetTimeEntriesByDay(day, month, year);
+            return result.Adapt<List<TimeEntryResponse>>();
+        }
+
+        public async Task<List<TimeEntryResponse>> GetTimeEntriesByMonth(int month, int year)
+        {
+            var result = await _timeEntryRepository.GetTimeEntriesByMonth(month,year);
+            return result.Adapt<List<TimeEntryResponse>>();
+        }
+
+        public async Task<List<TimeEntryResponse>> GetTimeEntriesByYear(int year)
+        {
+            var result = await _timeEntryRepository.GetTimeEntriesByYear(year);
+            return result.Adapt<List<TimeEntryResponse>>();
+        }
+
         public async Task<TimeEntryResponse?> GetTimeEntryById(int id)
         {
             var result = await _timeEntryRepository.GetTimeEntryById(id);

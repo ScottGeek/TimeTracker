@@ -1,0 +1,68 @@
+﻿@inject ITimeEntryService TimeEntryService
+
+@if (Type == TimeEntriesTab.TimeEntryFilterType.Day)
+{
+    <input type="date" 
+        @bind-value="now"
+        @bind-value:event="oninput"
+        @onchange="HandleDateSelection"
+           class=@Css />
+}
+else if (Type == TimeEntriesTab.TimeEntryFilterType.Month)
+{
+    <input type="month"
+           @bind-value="now"
+           @bind-value:event="oninput"
+           @onchange="HandleMonthSelection"
+           class=@Css />
+}
+else if (Type == TimeEntriesTab.TimeEntryFilterType.Year)
+{
+    <input type="number" min="1900" max="2999" step="1"
+           @bind-value="currentYear"
+           @bind-value:event="oninput"
+           @onchange="HandleMonthSelection"
+           class=@Css />
+}
+else if (Type == TimeEntriesTab.TimeEntryFilterType.Project)
+{
+    <ProjectSelector />
+}
+
+
+@code {
+
+    [Parameter]
+    public TimeEntriesTab.TimeEntryFilterType Type { get; set; } = TimeEntriesTab.TimeEntryFilterType.Day;
+
+    DateTime now = DateTime.Now;
+    int currentYear = DateTime.Now.Year;
+    string Css = "my-2 p-2 rounded-md border-gray-200 shadow-sm sm:text-sm";
+
+    private async Task HandleDateSelection(ChangeEventArgs e)
+    {
+        if (e.Value != null & DateTime.TryParse(e.Value!.ToString(), out var date))
+        {
+            await TimeEntryService.GetTimeEntriesByDay(date.Day, date.Month, date.Year); 
+        }
+    }
+
+    private async Task HandleMonthSelection(ChangeEventArgs e)
+    {
+        if (e.Value != null & DateTime.TryParse(e.Value!.ToString(), out var date))
+        {
+            await TimeEntryService.GetTimeEntriesByMonth(date.Month, date.Year);
+        }
+    }
+
+    private async Task HandleYearSelection(ChangeEventArgs e)
+    {
+        if (e.Value != null & Int32.TryParse(e.Value!.ToString(), out var year))
+        {
+            await TimeEntryService.GetTimeEntriesByYear(year);
+        }
+    }
+
+
+
+}

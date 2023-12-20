@@ -1,6 +1,7 @@
 ﻿@page "/login"
 @inject IAuthService AuthService
 
+<div class="lg:px-80">
 <h3>Login</h3>
 
 <EditForm Model="loginRequest" OnValidSubmit="HandleSubmit">
@@ -16,7 +17,7 @@
         <span class="text-xs text-red-600 font-bold my-1">@errorMessage</span>
     </div>
 }
-
+</div>
 @code {
 
     LoginRequest loginRequest = new LoginRequest();
